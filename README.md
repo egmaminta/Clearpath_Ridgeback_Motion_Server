@@ -87,7 +87,7 @@ source install/setup.bash
 **Terminal 1** — SSH into the Ridgeback:
 ```bash
 ssh administrator@192.168.131.1
-# Password: clearpath
+# Password: c***r***h
 ```
 
 Pull latest code, build, and run:
