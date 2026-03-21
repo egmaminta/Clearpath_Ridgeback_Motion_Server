@@ -15,22 +15,28 @@ cd ~/ridgeback
 
 # Pull latest changes
 echo ""
-echo "[1/4] Pulling latest changes..."
+echo "[1/5] Pulling latest changes..."
 git pull
 
 # Build
 echo ""
-echo "[2/4] Building package..."
+echo "[2/5] Building package..."
 colcon build --packages-select ridgeback_image_motion
 
 # Source
 echo ""
-echo "[3/4] Sourcing workspace..."
+echo "[3/5] Sourcing workspace..."
 source install/setup.bash
+
+# Kill any previous instance on port 8080
+echo ""
+echo "[4/5] Clearing port 8080..."
+kill $(lsof -t -i:8080) 2>/dev/null || true
+sleep 1
 
 # Run
 echo ""
-echo "[4/4] Starting web controller..."
+echo "[5/5] Starting web controller..."
 echo "=========================================="
 echo "Open in browser: http://$(hostname -I | awk '{print $1}'):8080"
 echo "=========================================="
