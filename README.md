@@ -54,12 +54,28 @@ This system uses **two machines** — the Ridgeback's onboard PC runs the motion
 
 Both machines need:
 - ROS2 Humble sourced (`source /opt/ros/humble/setup.bash`)
-- This package cloned and built in a ROS2 workspace
+- SSH key added to GitHub (since HTTPS password auth is not supported)
+- This package cloned and built
+
+#### 1. Set up SSH for GitHub
+
+Make sure the machine has an SSH key added to your GitHub account. Then set the remote to use SSH:
 
 ```bash
+# If cloning fresh
 cd ~
 git clone git@github.com:SuperMadee/Clearpath_Ridgeback_Motion_Server.git ridgeback
+
+# If already cloned via HTTPS, switch to SSH
 cd ~/ridgeback
+git remote set-url origin git@github.com:SuperMadee/Clearpath_Ridgeback_Motion_Server.git
+```
+
+#### 2. Build the package
+
+```bash
+cd ~/ridgeback
+source /opt/ros/humble/setup.bash
 colcon build --packages-select ridgeback_image_motion
 source install/setup.bash
 ```
