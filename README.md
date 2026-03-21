@@ -234,6 +234,26 @@ These are the custom nodes that bridge the **Ridgeback** and the **Jetson contro
 └──────────────────────────────────────────────────────────┘
 ```
 
+#### How It Works
+
+The system runs on **two computers** that communicate over WiFi using **ROS2 DDS** (Domain ID 0) — no broker or central server needed, nodes discover each other automatically.
+
+**Image Pipeline (Ridgeback → Jetson → Browser):**
+1. The **RealSense D435** camera captures raw frames
+2. The `/intel_realsense` driver node publishes them as `sensor_msgs/Image`
+3. `/image_publisher` subscribes, compresses each frame to JPEG, and publishes as `CompressedImage` — this reduces bandwidth for WiFi streaming
+4. The **web controller** on the Jetson subscribes to the compressed images and streams them as MJPEG video to the browser
+
+**Motion Pipeline (Browser → Jetson → Ridgeback → Wheels):**
+1. User presses a key (e.g. `W` for forward) on the web dashboard
+2. The **web controller** sends a `motion_service` request over ROS2 to the Ridgeback
+3. `/motion_server` receives the request with `linear`, `lateral`, and `angular` values and publishes a `Twist` message to `/cmd_vel`
+4. `twist_mux` selects the highest-priority velocity source (web controller vs. PS4 joystick vs. autonomy)
+5. `velocity_ctrl` converts the Twist into individual wheel speeds
+6. **PUMA motor drivers** spin the 4 omnidirectional wheels
+
+**The Closed Loop:** You see what the camera sees → you send a command → the robot moves → the next frame shows the result.
+
 ---
 
 ## 🛠️ Dependencies
