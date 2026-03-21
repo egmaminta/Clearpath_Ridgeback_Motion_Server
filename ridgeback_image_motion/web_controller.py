@@ -48,21 +48,21 @@ class RidgebackController(Node):
         self.max_linear_accel = self.get_parameter('max_linear_accel').value
         self.max_angular_accel = self.get_parameter('max_angular_accel').value
 
-        # QoS for image - minimal buffering
-        qos_profile = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
+        # QoS profiles
+        reliable_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE)
+        best_effort_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
 
         # Subscribers
         self.image_sub = self.create_subscription(
-            CompressedImage, image_topic, self.image_callback, qos_profile
+            CompressedImage, image_topic, self.image_callback, reliable_qos
         )
         self.odom_sub = self.create_subscription(
-            Odometry, odom_topic, self.odom_callback, 10
+            Odometry, odom_topic, self.odom_callback, reliable_qos
         )
 
         # LiDAR subscriber
-        lidar_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
         self.lidar_sub = self.create_subscription(
-            LaserScan, lidar_topic, self.lidar_callback, lidar_qos
+            LaserScan, lidar_topic, self.lidar_callback, best_effort_qos
         )
 
         # LiDAR state
