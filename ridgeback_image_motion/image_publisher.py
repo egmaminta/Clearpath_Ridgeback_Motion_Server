@@ -8,7 +8,7 @@ Runs on: Ridgeback R100
 
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge
 import cv2
@@ -38,7 +38,11 @@ class ImagePublisher(Node):
         self.publisher_ = self.create_publisher(CompressedImage, compressed_topic, 1)
 
         # Subscriber to raw RealSense images
-        qos_profile = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
+        qos_profile = QoSProfile(
+            depth=1,
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL
+        )
         self.subscription = self.create_subscription(
             Image, image_topic, self.image_callback, qos_profile
         )
