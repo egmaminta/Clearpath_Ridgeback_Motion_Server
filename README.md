@@ -131,7 +131,50 @@ ros2 service list | grep motion
 
 ---
 
-## 🎮 Teleop Controls
+## 🕹️ Basic Teleop (Without the Web Controller)
+
+You can drive the Ridgeback directly from the terminal without running the motion server or web controller.
+
+### Keyboard Teleop
+
+```bash
+# Install if not already installed
+sudo apt-get install ros-humble-teleop-twist-keyboard
+
+# Run keyboard teleop (remapped to the Ridgeback's cmd_vel topic)
+ros2 run teleop_twist_keyboard teleop_twist_keyboard \
+  --ros-args -r /cmd_vel:=/r100_0140/cmd_vel
+```
+
+Use `i` to go forward, `j`/`l` to rotate, `u`/`o` for arcs, and `k` to stop.
+
+### Manual Drive Commands (ros2 topic pub)
+
+```bash
+# Forward at 0.2 m/s
+ros2 topic pub /r100_0140/cmd_vel geometry_msgs/msg/Twist \
+  '{linear: {x: 0.2, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}' -r 10
+
+# Strafe left at 0.1 m/s (holonomic)
+ros2 topic pub /r100_0140/cmd_vel geometry_msgs/msg/Twist \
+  '{linear: {x: 0.0, y: 0.1, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}' -r 10
+
+# Rotate at 0.5 rad/s
+ros2 topic pub /r100_0140/cmd_vel geometry_msgs/msg/Twist \
+  '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.5}}' -r 10
+
+# Stop
+ros2 topic pub /r100_0140/cmd_vel geometry_msgs/msg/Twist \
+  '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}' --once
+```
+
+### PS4 Controller
+
+The PS4 controller works automatically via `clearpath-robot.service` — no extra setup needed. Just pair via Bluetooth and use the joysticks.
+
+---
+
+## 🎮 Web Dashboard Teleop Controls
 
 ### 🖱️ Click Controls (Omnidirectional Pad)
 
