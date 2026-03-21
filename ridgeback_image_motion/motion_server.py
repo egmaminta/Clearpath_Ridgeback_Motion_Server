@@ -43,7 +43,7 @@ class MotionServer(Node):
             self.cmd_vel_pub.publish(twist)
 
             if request.linear != 0.0 or request.lateral != 0.0 or request.angular != 0.0:
-                self.get_logger().debug(
+                self.get_logger().info(
                     f'Motion: linear={request.linear:.3f}, '
                     f'lateral={request.lateral:.3f}, '
                     f'angular={request.angular:.3f}'
