@@ -566,13 +566,20 @@ HTML_PAGE = """
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .main-grid {
+        .top-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 20px;
+            margin-bottom: 20px;
+        }
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
         @media (max-width: 900px) {
-            .main-grid { grid-template-columns: 1fr; }
+            .top-grid { grid-template-columns: 1fr; }
+            .bottom-grid { grid-template-columns: 1fr; }
         }
         .video-container {
             background: #1a1e2e;
@@ -851,24 +858,55 @@ HTML_PAGE = """
         <h1>Ridgeback R100 Controller</h1>
         <p style="text-align: center; color: #888; margin-top: -10px; margin-bottom: 20px;">Omnidirectional Video & Teleop Dashboard</p>
 
-        <div class="main-grid">
+        <div class="top-grid">
             <div class="video-container">
                 <h2>RealSense Camera Feed (Live)</h2>
                 <img id="video" src="/video_feed" alt="Camera Feed">
-
-                <div class="lidar-container">
-                    <h2>LiDAR Map (Top-Down)</h2>
-                    <canvas id="lidar-canvas" width="600" height="600"></canvas>
-                    <div class="lidar-info">
-                        <span id="lidar-closest">Closest: --</span>
-                        <span id="lidar-points">Points: --</span>
-                        <span>Hokuyo UST-10LX (270&deg;)</span>
-                    </div>
-                </div>
             </div>
 
             <div class="panel">
-                <h2>Robot Status</h2>
+                <h2>Teleop Control</h2>
+                <div class="speed-controls">
+                    <div class="input-group">
+                        <label>Linear Speed (m/s)</label>
+                        <input type="range" id="lin-speed" min="0.05" max="0.5" step="0.05" value="0.2">
+                        <span id="lin-speed-val">0.20</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Angular Speed (rad/s)</label>
+                        <input type="range" id="ang-speed" min="0.1" max="1.5" step="0.1" value="0.5">
+                        <span id="ang-speed-val">0.50</span>
+                    </div>
+                </div>
+                <div class="teleop-section">
+                    <div class="teleop-pad">
+                        <div class="teleop-label">Omnidirectional Movement</div>
+                        <div class="teleop-row">
+                            <button class="teleop-btn" id="btn-fl" title="Forward + Strafe Left">&#8598;</button>
+                            <button class="teleop-btn" id="btn-fwd" title="Forward">&#9650;</button>
+                            <button class="teleop-btn" id="btn-fr" title="Forward + Strafe Right">&#8599;</button>
+                        </div>
+                        <div class="teleop-row">
+                            <button class="teleop-btn" id="btn-sl" title="Strafe Left">&#9664;</button>
+                            <button class="teleop-btn stop-btn" id="btn-stop" title="Stop">&#9632;</button>
+                            <button class="teleop-btn" id="btn-sr" title="Strafe Right">&#9654;</button>
+                        </div>
+                        <div class="teleop-row">
+                            <button class="teleop-btn" id="btn-bl" title="Backward + Strafe Left">&#8601;</button>
+                            <button class="teleop-btn" id="btn-bwd" title="Backward">&#9660;</button>
+                            <button class="teleop-btn" id="btn-br" title="Backward + Strafe Right">&#8600;</button>
+                        </div>
+                    </div>
+                    <div class="rotate-row">
+                        <button class="rotate-btn" id="btn-ccw" title="Rotate CCW">&#8634; CCW</button>
+                        <button class="rotate-btn" id="btn-cw" title="Rotate CW">CW &#8635;</button>
+                    </div>
+                </div>
+                <p style="text-align: center; color: #7a8fa0; font-size: 0.8em; margin-top: 10px;">
+                    Click to move continuously | Click again or Stop to halt | Keyboard: WASD + QE (rotate)
+                </p>
+
+                <h2 style="margin-top: 15px;">Robot Status</h2>
                 <div class="status-bar">
                     <span class="status-text" id="status">Connecting...</span>
                 </div>
@@ -885,6 +923,13 @@ HTML_PAGE = """
                     </div>
                 </div>
 
+                <h2>Motion Log</h2>
+                <div class="log-box" id="log-box"></div>
+            </div>
+        </div>
+
+        <div class="bottom-grid">
+            <div class="panel">
                 <h2>Pose</h2>
                 <div class="info-grid">
                     <div class="info-item">
@@ -916,52 +961,16 @@ HTML_PAGE = """
                         <div class="info-value" id="lat-odom">--</div>
                     </div>
                 </div>
+            </div>
 
-                <div class="control-section">
-                    <h2>Teleop Control</h2>
-                    <div class="speed-controls">
-                        <div class="input-group">
-                            <label>Linear Speed (m/s)</label>
-                            <input type="range" id="lin-speed" min="0.05" max="0.5" step="0.05" value="0.2">
-                            <span id="lin-speed-val">0.20</span>
-                        </div>
-                        <div class="input-group">
-                            <label>Angular Speed (rad/s)</label>
-                            <input type="range" id="ang-speed" min="0.1" max="1.5" step="0.1" value="0.5">
-                            <span id="ang-speed-val">0.50</span>
-                        </div>
-                    </div>
-                    <div class="teleop-section">
-                        <div class="teleop-pad">
-                            <div class="teleop-label">Omnidirectional Movement</div>
-                            <div class="teleop-row">
-                                <button class="teleop-btn" id="btn-fl" title="Forward + Strafe Left">&#8598;</button>
-                                <button class="teleop-btn" id="btn-fwd" title="Forward">&#9650;</button>
-                                <button class="teleop-btn" id="btn-fr" title="Forward + Strafe Right">&#8599;</button>
-                            </div>
-                            <div class="teleop-row">
-                                <button class="teleop-btn" id="btn-sl" title="Strafe Left">&#9664;</button>
-                                <button class="teleop-btn stop-btn" id="btn-stop" title="Stop">&#9632;</button>
-                                <button class="teleop-btn" id="btn-sr" title="Strafe Right">&#9654;</button>
-                            </div>
-                            <div class="teleop-row">
-                                <button class="teleop-btn" id="btn-bl" title="Backward + Strafe Left">&#8601;</button>
-                                <button class="teleop-btn" id="btn-bwd" title="Backward">&#9660;</button>
-                                <button class="teleop-btn" id="btn-br" title="Backward + Strafe Right">&#8600;</button>
-                            </div>
-                        </div>
-                        <div class="rotate-row">
-                            <button class="rotate-btn" id="btn-ccw" title="Rotate CCW">&#8634; CCW</button>
-                            <button class="rotate-btn" id="btn-cw" title="Rotate CW">CW &#8635;</button>
-                        </div>
-                    </div>
-                    <p style="text-align: center; color: #7a8fa0; font-size: 0.8em; margin-top: 10px;">
-                        Click to move continuously | Click again or Stop to halt | Keyboard: WASD + QE (rotate)
-                    </p>
+            <div class="lidar-container">
+                <h2>LiDAR Map (Top-Down)</h2>
+                <canvas id="lidar-canvas" width="600" height="600"></canvas>
+                <div class="lidar-info">
+                    <span id="lidar-closest">Closest: --</span>
+                    <span id="lidar-points">Points: --</span>
+                    <span>Hokuyo UST-10LX (270&deg;)</span>
                 </div>
-
-                <h2>Motion Log</h2>
-                <div class="log-box" id="log-box"></div>
             </div>
         </div>
     </div>
