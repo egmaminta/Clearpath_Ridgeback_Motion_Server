@@ -5,6 +5,14 @@
         <participant profile_name="participant_profile" is_default_profile="true">
             <rtps>
                 <builtin>
+                    <metatrafficMulticastLocatorList>
+                        <locator>
+                            <udpv4>
+                                <address>239.255.0.1</address>
+                                <port>7400</port>
+                            </udpv4>
+                        </locator>
+                    </metatrafficMulticastLocatorList>
                     <initialPeersList>
                         <locator>
                             <udpv4>
