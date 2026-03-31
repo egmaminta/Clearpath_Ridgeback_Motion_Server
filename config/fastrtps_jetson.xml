@@ -17,6 +17,11 @@
                                 <address>10.158.39.203</address>
                             </udpv4>
                         </locator>
+                        <locator>
+                            <udpv4>
+                                <address>10.158.37.138</address>
+                            </udpv4>
+                        </locator>
                     </initialPeersList>
                 </builtin>
             </rtps>
